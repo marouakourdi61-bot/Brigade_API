@@ -44,7 +44,7 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        
+
         // Validation 
         $request->validate([
             'email' => 'required|email',
@@ -75,6 +75,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         // Supprimer token 
+        
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
