@@ -75,7 +75,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         // Supprimer token 
-        
+
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
@@ -88,6 +88,7 @@ class AuthController extends Controller
      */
     public function user(Request $request)
     {
+        
         return response()->json($request->user());
     }
 }
