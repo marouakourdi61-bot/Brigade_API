@@ -3,14 +3,21 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
 
 class Plat extends Model
 {
-    protected $fillable = ['name', 'description', 'price', 'category_id', 'user_id'];
+    protected $fillable = [
+        'name',
+        'description',
+        'price',
+        'image',
+        'is_available',
+        'category_id',
+        'user_id',
+    ];
 
     // Relation avec catégorie
     public function category()
@@ -22,5 +29,17 @@ class Plat extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Plat  Ingredients (pivot)
+    public function ingredients(): BelongsToMany
+    {
+        return $this->belongsToMany(Ingredient::class, 'ingredient_plate');
+    }
+
+    // Plat  Recommendations
+    public function recommendations(): HasMany
+    {
+        return $this->hasMany(Recommendation::class);
     }
 }

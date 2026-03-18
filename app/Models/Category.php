@@ -6,7 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-    protected $fillable = ['name', 'user_id'];
+    protected $fillable = [
+        'name',
+        'description',
+        'color',
+        'is_active',
+        'user_id',
+    ];
 
     // Relation avec les plats
     public function plats()
