@@ -12,6 +12,7 @@ class Category extends Model
         'color',
         'is_active',
         'user_id',
+        
     ];
 
     // Relation avec les plats

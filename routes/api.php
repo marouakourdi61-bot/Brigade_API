@@ -31,6 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Routes client uniquement
     Route::get('categories', [CategoryController::class, 'index']);
     Route::get('categories/{category}/plats', [CategoryController::class, 'showPlates']);
+    
 
     Route::get('plats', [PlatController::class, 'index']);
     Route::get('plats/{plat}', [PlatController::class, 'show']);
@@ -54,5 +55,14 @@ Route::middleware(['auth:sanctum', AdminMiddleware::class])->group(function () {
     // Ajouter un plat à une catégorie
     Route::post('categories/{category}/plats', [PlatController::class, 'storeByCategory']);
 
+    // Ingredients 
+    Route::apiResource('ingredients', IngredientController::class)->except(['show']);
+
+    //admin statistique
+    Route::get('/admin/stats', [AdminController::class, 'stats']);
+
+    //IA
+
+    Route::post(  '/recommendations/analyze/{plate_id}', [RecommendationController::class, 'analyze']);
   
 });
