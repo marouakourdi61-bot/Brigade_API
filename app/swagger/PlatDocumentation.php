@@ -1,160 +1,97 @@
-<?php 
+<?php
+
 namespace App\Swagger;
 use OpenApi\Attributes as OA;
 
 class PlatDocumentation {
 
- #[OA\Get(
-        path: "/api/plats",
-        summary: "Get all plats",
-        tags: ["Plats"],
-        security: [["sanctum" => []]],
+    #[OA\Get(
+        path: "/api/plates",
+        summary: "List available plates",
+        tags: ["Plates"],
         responses: [
-            new OA\Response(
-                response: 200,
-                description: "List of plats"
-            ),
-            new OA\Response(
-                response: 401,
-                description: "Unauthenticated"
-            )
+            new OA\Response(response: 200, description: "List of plates")
         ]
     )]
     public function index(){}
 
-    #[OA\Post(
-        path: "/api/plats",
-        summary: "Create a plat",
-        tags: ["Plats"],
-        security: [["sanctum" => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ["name","price","category_id"],
-                properties: [
-                    new OA\Property(property: "name", type: "string", example: "Pizza"),
-                    new OA\Property(property: "description", type: "string", example: "Pizza fromage"),
-                    new OA\Property(property: "price", type: "number", example: 80),
-                    new OA\Property(property: "category_id", type: "integer", example: 1)
-                ]
-            )
-        ),
-        responses: [
-            new OA\Response(response: 201, description: "Plat created"),
-            new OA\Response(response: 422, description: "Validation error")
-        ]
-    )]
-    public function store(){}
-
-
     #[OA\Get(
-        path: "/api/plats/{id}",
-        summary: "Get a plat",
-        tags: ["Plats"],
-        security: [["sanctum" => []]],
+        path: "/api/plates/{id}",
+        summary: "Show plate details",
+        tags: ["Plates"],
         parameters: [
-            new OA\Parameter(
-                name: "id",
-                in: "path",
-                required: true,
-                schema: new OA\Schema(type: "integer")
-            )
+            new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "integer"))
         ],
         responses: [
-            new OA\Response(response: 200, description: "Plat details"),
-            new OA\Response(response: 404, description: "Plat not found")
+            new OA\Response(response: 200, description: "Plate details")
         ]
     )]
     public function show(){}
 
-
-    #[OA\Put(
-        path: "/api/plats/{id}",
-        summary: "Update a plat",
-        tags: ["Plats"],
+    #[OA\Post(
+        path: "/api/plates",
+        summary: "Create a plate",
+        tags: ["Plates"],
         security: [["sanctum" => []]],
-        parameters: [
-            new OA\Parameter(
-                name: "id",
-                in: "path",
-                required: true,
-                schema: new OA\Schema(type: "integer")
-            )
-        ],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
                 required: ["name","price","category_id"],
                 properties: [
-                    new OA\Property(property: "name", type: "string", example: "Pizza"),
-                    new OA\Property(property: "description", type: "string", example: "Pizza fromage"),
-                    new OA\Property(property: "price", type: "number", example: 90),
-                    new OA\Property(property: "category_id", type: "integer", example: 1)
+                    new OA\Property(property: "name", type: "string"),
+                    new OA\Property(property: "description", type: "string"),
+                    new OA\Property(property: "price", type: "number"),
+                    new OA\Property(property: "image", type: "string"),
+                    new OA\Property(property: "is_available", type: "boolean"),
+                    new OA\Property(property: "category_id", type: "integer"),
+                    new OA\Property(property: "ingredient_ids", type: "array", items: new OA\Items(type: "integer"))
                 ]
             )
         ),
         responses: [
-            new OA\Response(response: 200, description: "Plat updated"),
-            new OA\Response(response: 404, description: "Plat not found")
+            new OA\Response(response: 201, description: "Plate created")
+        ]
+    )]
+    public function store(){}
+
+    #[OA\Put(
+        path: "/api/plates/{id}",
+        summary: "Update a plate",
+        tags: ["Plates"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: "name", type: "string"),
+                    new OA\Property(property: "description", type: "string"),
+                    new OA\Property(property: "price", type: "number"),
+                    new OA\Property(property: "image", type: "string"),
+                    new OA\Property(property: "is_available", type: "boolean"),
+                    new OA\Property(property: "category_id", type: "integer"),
+                    new OA\Property(property: "ingredient_ids", type: "array", items: new OA\Items(type: "integer"))
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: "Plate updated")
         ]
     )]
     public function update(){}
 
-
-
     #[OA\Delete(
-        path: "/api/plats/{id}",
-        summary: "Delete a plat",
-        tags: ["Plats"],
+        path: "/api/plates/{id}",
+        summary: "Delete a plate",
+        tags: ["Plates"],
         security: [["sanctum" => []]],
         parameters: [
-            new OA\Parameter(
-                name: "id",
-                in: "path",
-                required: true,
-                schema: new OA\Schema(type: "integer")
-            )
+            new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "integer"))
         ],
         responses: [
-            new OA\Response(response: 200, description: "Plat deleted"),
-            new OA\Response(response: 404, description: "Plat not found")
+            new OA\Response(response: 200, description: "Plate deleted")
         ]
     )]
     public function destroy(){}
-
-    #[OA\Post(
-        path: "/api/categories/{id}/plats",
-        summary: "Create a plat in a category",
-        tags: ["Categories","Plats"],
-        security: [["sanctum" => []]],
-        parameters: [
-            new OA\Parameter(
-                name: "id",
-                in: "path",
-                required: true,
-                description: "Category ID",
-                schema: new OA\Schema(type: "integer")
-            )
-        ],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ["name","price"],
-                properties: [
-                    new OA\Property(property: "name", type: "string", example: "Burger"),
-                    new OA\Property(property: "description", type: "string", example: "Burger viande"),
-                    new OA\Property(property: "price", type: "number", example: 70)
-                ]
-            )
-        ),
-        responses: [
-            new OA\Response(
-                response: 201,
-                description: "Plat created in category"
-            )
-        ]
-    )]
-    public function storeByCategory() {}
-
-    
 }

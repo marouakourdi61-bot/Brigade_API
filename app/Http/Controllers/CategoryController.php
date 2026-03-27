@@ -4,88 +4,88 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
-use Illuminate\Support\Facades\Auth;
-use OpenApi\Attributes as OA;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-
-use Illuminate\Support\Facades\Gate;
 
 class CategoryController extends Controller
 {
-      use AuthorizesRequests;
+    // CLIENT
+   
 
-
-    /**
-     * Display a listing of the resource.
-     */
+    // GET 
     public function index()
     {
-
-        $categories = Category::where('user_id', Auth::id())->get();
-        return response()->json($categories, 200);
+        return response()->json(
+            Category::where('is_active', true)->get(),
+            200
+        );
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    
+    public function showPlates(Category $category)
+    {
+        return response()->json(
+            $category->plats()
+                ->where('is_available', true)
+                ->get(),
+            200
+        );
+    }
+
+    // ADMIN
+     
+
+    // POST 
     public function store(Request $request)
     {
-        $this->authorize('create', Category::class); 
-
-        $request->validate([
-            'name' =>  ['required', 'string', 'max:255'],
+        $data = $request->validate([
+            'name' => 'required|string|max:100|unique:categories,name',
+            'description' => 'nullable|string',
+            'color' => 'nullable|string',
+            'is_active' => 'boolean'
         ]);
 
-        $category = Category::create([
-            'name' => $request->name,
-            'user_id' => Auth::id(),
-        ]);
+        $category = Category::create($data);
 
         return response()->json($category, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show($id)
+    // GET
+    public function show(Category $category)
     {
-        $category = Category::findOrFail( $id);
-         
-        $this->authorize('view', $category);
-
-        return response()->json($category);
+        return response()->json($category, 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Category $categorie)
+    // PUT 
+    public function update(Request $request, Category $category)
     {
-        $this->authorize('update', $categorie);
-
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:300'],
+            'name' => 'string|max:100|unique:categories,name,' . $category->id,
+            'description' => 'nullable|string',
+            'color' => 'nullable|string',
+            'is_active' => 'boolean'
         ]);
 
-        $categorie->update($data);
+        $category->update($data);
 
         return response()->json([
             'message' => 'Catégorie mise à jour avec succès',
-            'categorie' => $categorie,
+            'category' => $category
         ], 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-     public function destroy(Category $categorie)
+    // DELETE 
+    public function destroy(Category $category)
     {
-        $this->authorize('delete', $categorie);
+        
+        if ($category->plats()->count() > 0) {
+            return response()->json([
+                'message' => 'Impossible de supprimer une catégorie contenant des plats'
+            ], 400);
+        }
 
-        $categorie->delete();
+        $category->delete();
 
         return response()->json([
-            'message' => 'Catégorie supprimée avec succès',
+            'message' => 'Catégorie supprimée avec succès'
         ], 200);
     }
 }

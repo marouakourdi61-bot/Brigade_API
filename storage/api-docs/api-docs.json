@@ -12,6 +12,28 @@
         }
     ],
     "paths": {
+        "/api/admin/stats": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get admin statistics",
+                "operationId": "1651a7bceb0d15e5b2b8e1594fe6e017",
+                "responses": {
+                    "200": {
+                        "description": "Statistics for plates, categories, ingredients, recommendations"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/register": {
             "post": {
                 "tags": [
@@ -28,7 +50,8 @@
                                     "name",
                                     "email",
                                     "password",
-                                    "password_confirmation"
+                                    "password_confirmation",
+                                    "role"
                                 ],
                                 "properties": {
                                     "name": {
@@ -46,6 +69,10 @@
                                     "password_confirmation": {
                                         "type": "string",
                                         "example": "123456"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "client"
                                     }
                                 },
                                 "type": "object"
@@ -150,21 +177,13 @@
                 "tags": [
                     "Categories"
                 ],
-                "summary": "Get all categories for authenticated user",
+                "summary": "List active categories",
                 "operationId": "41511d0f0ce0157e42bc3ee6bcc40f9d",
                 "responses": {
                     "200": {
                         "description": "List of categories"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
                     }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
+                }
             },
             "post": {
                 "tags": [
@@ -182,8 +201,16 @@
                                 ],
                                 "properties": {
                                     "name": {
-                                        "type": "string",
-                                        "example": "Desserts"
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "color": {
+                                        "type": "string"
+                                    },
+                                    "is_active": {
+                                        "type": "boolean"
                                     }
                                 },
                                 "type": "object"
@@ -194,9 +221,6 @@
                 "responses": {
                     "201": {
                         "description": "Category created"
-                    },
-                    "422": {
-                        "description": "Validation error"
                     }
                 },
                 "security": [
@@ -211,7 +235,7 @@
                 "tags": [
                     "Categories"
                 ],
-                "summary": "Get a category",
+                "summary": "Show a category",
                 "operationId": "b88e8f86148175156b7d2507906df7d7",
                 "parameters": [
                     {
@@ -226,16 +250,8 @@
                 "responses": {
                     "200": {
                         "description": "Category details"
-                    },
-                    "404": {
-                        "description": "Category not found"
                     }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
+                }
             },
             "put": {
                 "tags": [
@@ -258,13 +274,18 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "name"
-                                ],
                                 "properties": {
                                     "name": {
-                                        "type": "string",
-                                        "example": "Plats principaux"
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "color": {
+                                        "type": "string"
+                                    },
+                                    "is_active": {
+                                        "type": "boolean"
                                     }
                                 },
                                 "type": "object"
@@ -275,9 +296,6 @@
                 "responses": {
                     "200": {
                         "description": "Category updated"
-                    },
-                    "404": {
-                        "description": "Category not found"
                     }
                 },
                 "security": [
@@ -306,8 +324,8 @@
                     "200": {
                         "description": "Category deleted"
                     },
-                    "404": {
-                        "description": "Category not found"
+                    "400": {
+                        "description": "Cannot delete category with plates"
                     }
                 },
                 "security": [
@@ -317,19 +335,40 @@
                 ]
             }
         },
-        "/api/plats": {
+        "/api/categories/{id}/plates": {
             "get": {
                 "tags": [
-                    "Plats"
+                    "Categories"
                 ],
-                "summary": "Get all plats",
-                "operationId": "defc11b17a0b612d496c0d4b2db43a7b",
+                "summary": "List plates by category",
+                "operationId": "4a3473241591bb8f9a23dd4caf9688a2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "List of plats"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
+                        "description": "List of plates"
+                    }
+                }
+            }
+        },
+        "/api/ingredients": {
+            "get": {
+                "tags": [
+                    "Ingredients"
+                ],
+                "summary": "List all ingredients",
+                "operationId": "a2297a229f09226a5189dfa74d241b77",
+                "responses": {
+                    "200": {
+                        "description": "List of ingredients"
                     }
                 },
                 "security": [
@@ -340,36 +379,28 @@
             },
             "post": {
                 "tags": [
-                    "Plats"
+                    "Ingredients"
                 ],
-                "summary": "Create a plat",
-                "operationId": "a29b75a83dee95835d5740ae69551fd0",
+                "summary": "Create a new ingredient",
+                "operationId": "1c02cec9d33362922f6f9b0a7a1dee15",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "name",
-                                    "price",
-                                    "category_id"
+                                    "name"
                                 ],
                                 "properties": {
                                     "name": {
-                                        "type": "string",
-                                        "example": "Pizza"
+                                        "type": "string"
                                     },
-                                    "description": {
-                                        "type": "string",
-                                        "example": "Pizza fromage"
-                                    },
-                                    "price": {
-                                        "type": "number",
-                                        "example": 80
-                                    },
-                                    "category_id": {
-                                        "type": "integer",
-                                        "example": 1
+                                    "tags": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "contains_meat"
+                                        }
                                     }
                                 },
                                 "type": "object"
@@ -379,10 +410,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Plat created"
-                    },
-                    "422": {
-                        "description": "Validation error"
+                        "description": "Ingredient created"
                     }
                 },
                 "security": [
@@ -392,43 +420,13 @@
                 ]
             }
         },
-        "/api/plats/{id}": {
-            "get": {
-                "tags": [
-                    "Plats"
-                ],
-                "summary": "Get a plat",
-                "operationId": "be2129fdbc9308c1249104c02f8c0aa8",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Plat details"
-                    },
-                    "404": {
-                        "description": "Plat not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
+        "/api/ingredients/{id}": {
             "put": {
                 "tags": [
-                    "Plats"
+                    "Ingredients"
                 ],
-                "summary": "Update a plat",
-                "operationId": "182416e75748664cd1ffb9213fe0b1ac",
+                "summary": "Update an ingredient",
+                "operationId": "f2d4c77c4071ab1ebd93238719c43cfc",
                 "parameters": [
                     {
                         "name": "id",
@@ -445,26 +443,17 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "name",
-                                    "price",
-                                    "category_id"
+                                    "name"
                                 ],
                                 "properties": {
                                     "name": {
-                                        "type": "string",
-                                        "example": "Pizza"
+                                        "type": "string"
                                     },
-                                    "description": {
-                                        "type": "string",
-                                        "example": "Pizza fromage"
-                                    },
-                                    "price": {
-                                        "type": "number",
-                                        "example": 90
-                                    },
-                                    "category_id": {
-                                        "type": "integer",
-                                        "example": 1
+                                    "tags": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
                                     }
                                 },
                                 "type": "object"
@@ -474,10 +463,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Plat updated"
-                    },
-                    "404": {
-                        "description": "Plat not found"
+                        "description": "Ingredient updated"
                     }
                 },
                 "security": [
@@ -488,10 +474,10 @@
             },
             "delete": {
                 "tags": [
-                    "Plats"
+                    "Ingredients"
                 ],
-                "summary": "Delete a plat",
-                "operationId": "2351f26c0e4fed69c892312e22bb06db",
+                "summary": "Delete an ingredient",
+                "operationId": "b9613048e2f4d61c334f25358967d4fa",
                 "parameters": [
                     {
                         "name": "id",
@@ -504,10 +490,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Plat deleted"
-                    },
-                    "404": {
-                        "description": "Plat not found"
+                        "description": "Ingredient deleted"
                     }
                 },
                 "security": [
@@ -517,25 +500,25 @@
                 ]
             }
         },
-        "/api/categories/{id}/plats": {
+        "/api/plates": {
+            "get": {
+                "tags": [
+                    "Plates"
+                ],
+                "summary": "List available plates",
+                "operationId": "8b57a793633f6de1f799a40136886c7f",
+                "responses": {
+                    "200": {
+                        "description": "List of plates"
+                    }
+                }
+            },
             "post": {
                 "tags": [
-                    "Categories",
-                    "Plats"
+                    "Plates"
                 ],
-                "summary": "Create a plat in a category",
-                "operationId": "89731bab1b80807ba5bdd9e5f7a9fd70",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Category ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
+                "summary": "Create a plate",
+                "operationId": "cb454870237b0dec9938e1422848a1e4",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -543,20 +526,33 @@
                             "schema": {
                                 "required": [
                                     "name",
-                                    "price"
+                                    "price",
+                                    "category_id"
                                 ],
                                 "properties": {
                                     "name": {
-                                        "type": "string",
-                                        "example": "Burger"
+                                        "type": "string"
                                     },
                                     "description": {
-                                        "type": "string",
-                                        "example": "Burger viande"
+                                        "type": "string"
                                     },
                                     "price": {
-                                        "type": "number",
-                                        "example": 70
+                                        "type": "number"
+                                    },
+                                    "image": {
+                                        "type": "string"
+                                    },
+                                    "is_available": {
+                                        "type": "boolean"
+                                    },
+                                    "category_id": {
+                                        "type": "integer"
+                                    },
+                                    "ingredient_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
                                     }
                                 },
                                 "type": "object"
@@ -566,7 +562,261 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Plat created in category"
+                        "description": "Plate created"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/plates/{id}": {
+            "get": {
+                "tags": [
+                    "Plates"
+                ],
+                "summary": "Show plate details",
+                "operationId": "4aecd024bd532cd789c358ba233dd09a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plate details"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Plates"
+                ],
+                "summary": "Update a plate",
+                "operationId": "3effc53bf0e76292b9c13d464397abe8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "price": {
+                                        "type": "number"
+                                    },
+                                    "image": {
+                                        "type": "string"
+                                    },
+                                    "is_available": {
+                                        "type": "boolean"
+                                    },
+                                    "category_id": {
+                                        "type": "integer"
+                                    },
+                                    "ingredient_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Plate updated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Plates"
+                ],
+                "summary": "Delete a plate",
+                "operationId": "4955a4e6242bcadbcd2ab879530d6bad",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plate deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/profile": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Get the authenticated user's profile",
+                "operationId": "183b5453c1a7cc34a0e8bb6d404f4953",
+                "responses": {
+                    "200": {
+                        "description": "Authenticated user profile"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update authenticated user's profile dietary tags",
+                "operationId": "300d191dc5d67a2146fbcb1519cdd453",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "dietary_tags": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "vegan"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile updated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/recommendations/analyze/{plate_id}": {
+            "post": {
+                "tags": [
+                    "Recommendations"
+                ],
+                "summary": "Analyze a plate for the authenticated user",
+                "operationId": "e21f3077300674fc3e27e60ea8e8b3fd",
+                "parameters": [
+                    {
+                        "name": "plate_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Recommendation processing"
+                    },
+                    "404": {
+                        "description": "Plate not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/recommendations": {
+            "get": {
+                "tags": [
+                    "Recommendations"
+                ],
+                "summary": "List all recommendations of the authenticated user",
+                "operationId": "1595c3aa76650a5e038fd92e9371ab28",
+                "responses": {
+                    "200": {
+                        "description": "List of recommendations"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/recommendations/{plate_id}": {
+            "get": {
+                "tags": [
+                    "Recommendations"
+                ],
+                "summary": "Get a specific recommendation by plate",
+                "operationId": "dcc1a47e57c56d6c57d5031a4b74e1a4",
+                "parameters": [
+                    {
+                        "name": "plate_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recommendation details"
+                    },
+                    "202": {
+                        "description": "Recommendation still processing"
+                    },
+                    "404": {
+                        "description": "Recommendation not found"
                     }
                 },
                 "security": [
@@ -588,6 +838,10 @@
     },
     "tags": [
         {
+            "name": "Admin",
+            "description": "Admin"
+        },
+        {
             "name": "Auth",
             "description": "Auth"
         },
@@ -596,8 +850,20 @@
             "description": "Categories"
         },
         {
-            "name": "Plats",
-            "description": "Plats"
+            "name": "Ingredients",
+            "description": "Ingredients"
+        },
+        {
+            "name": "Plates",
+            "description": "Plates"
+        },
+        {
+            "name": "Profile",
+            "description": "Profile"
+        },
+        {
+            "name": "Recommendations",
+            "description": "Recommendations"
         }
     ]
 }
