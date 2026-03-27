@@ -46,6 +46,7 @@ Route::middleware(['auth:sanctum', AdminMiddleware::class])->group(function () {
     Route::post('categories', [CategoryController::class, 'store']);
     Route::put('categories/{category}', [CategoryController::class, 'update']);
     Route::delete('categories/{category}', [CategoryController::class, 'destroy']);
+    Route::get('categories/{category}', [CategoryController::class, 'show']);
 
     // Plats 
     Route::post('plats', [PlatController::class, 'store']);
@@ -64,5 +65,9 @@ Route::middleware(['auth:sanctum', AdminMiddleware::class])->group(function () {
     //IA
 
     Route::post(  '/recommendations/analyze/{plate_id}', [RecommendationController::class, 'analyze']);
+
+    Route::get(  '/recommendations', [RecommendationController::class, 'index']);
+
+    Route::get(  '/recommendations/{plate_id}', [RecommendationController::class, 'analyze']);
   
 });

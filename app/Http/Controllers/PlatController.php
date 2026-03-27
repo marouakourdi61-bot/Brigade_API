@@ -49,7 +49,7 @@ class PlatController extends Controller
 
         $plat = Plat::create($data);
 
-        // relation manytomany
+        // relation 
         if ($request->has('ingredient_ids')) {
             $plat->ingredients()->sync($request->ingredient_ids);
         }

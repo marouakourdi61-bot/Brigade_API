@@ -9,7 +9,7 @@ class Recommendation extends Model
 {
     protected $fillable = [
         'user_id',
-        'plate_id',
+        'plat_id',
         'score',
         'label',
         'warning_message',

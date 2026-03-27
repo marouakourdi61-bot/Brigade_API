@@ -2,29 +2,17 @@
 
 namespace App\Swagger;
 use OpenApi\Attributes as OA;
-class CategoryDocumentation
-{
+
+class CategoryDocumentation {
     #[OA\Get(
         path: "/api/categories",
-        summary: "Get all categories for authenticated user",
+        summary: "List active categories",
         tags: ["Categories"],
-        security: [["sanctum" => []]],
         responses: [
-            new OA\Response(
-                response: 200,
-                description: "List of categories"
-            ),
-            new OA\Response(
-                response: 401,
-                description: "Unauthenticated"
-            )
+            new OA\Response(response: 200, description: "List of categories")
         ]
     )]
-    public function index()
-    {
-    }
-
-
+    public function index(){}
 
     #[OA\Post(
         path: "/api/categories",
@@ -36,42 +24,31 @@ class CategoryDocumentation
             content: new OA\JsonContent(
                 required: ["name"],
                 properties: [
-                    new OA\Property(property: "name", type: "string", example: "Desserts")
+                    new OA\Property(property: "name", type: "string"),
+                    new OA\Property(property: "description", type: "string"),
+                    new OA\Property(property: "color", type: "string"),
+                    new OA\Property(property: "is_active", type: "boolean")
                 ]
             )
         ),
         responses: [
-            new OA\Response(response: 201, description: "Category created"),
-            new OA\Response(response: 422, description: "Validation error")
+            new OA\Response(response: 201, description: "Category created")
         ]
     )]
-    public function store()
-    {
-    }
-
-
+    public function store(){}
 
     #[OA\Get(
         path: "/api/categories/{id}",
-        summary: "Get a category",
+        summary: "Show a category",
         tags: ["Categories"],
-        security: [["sanctum" => []]],
         parameters: [
-            new OA\Parameter(
-                name: "id",
-                in: "path",
-                required: true,
-                schema: new OA\Schema(type: "integer")
-            )
+            new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "integer"))
         ],
         responses: [
-            new OA\Response(response: 200, description: "Category details"),
-            new OA\Response(response: 404, description: "Category not found")
+            new OA\Response(response: 200, description: "Category details")
         ]
     )]
-
     public function show(){}
-
 
     #[OA\Put(
         path: "/api/categories/{id}",
@@ -79,49 +56,50 @@ class CategoryDocumentation
         tags: ["Categories"],
         security: [["sanctum" => []]],
         parameters: [
-            new OA\Parameter(
-                name: "id",
-                in: "path",
-                required: true,
-                schema: new OA\Schema(type: "integer")
-            )
+            new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "integer"))
         ],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ["name"],
                 properties: [
-                    new OA\Property(property: "name", type: "string", example: "Plats principaux")
+                    new OA\Property(property: "name", type: "string"),
+                    new OA\Property(property: "description", type: "string"),
+                    new OA\Property(property: "color", type: "string"),
+                    new OA\Property(property: "is_active", type: "boolean")
                 ]
             )
         ),
         responses: [
-            new OA\Response(response: 200, description: "Category updated"),
-            new OA\Response(response: 404, description: "Category not found")
+            new OA\Response(response: 200, description: "Category updated")
         ]
     )]
+    public function update(){}
 
-     public function update(){}
-
-
-
-     #[OA\Delete(
+    #[OA\Delete(
         path: "/api/categories/{id}",
         summary: "Delete a category",
         tags: ["Categories"],
         security: [["sanctum" => []]],
         parameters: [
-            new OA\Parameter(
-                name: "id",
-                in: "path",
-                required: true,
-                schema: new OA\Schema(type: "integer")
-            )
+            new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "integer"))
         ],
         responses: [
             new OA\Response(response: 200, description: "Category deleted"),
-            new OA\Response(response: 404, description: "Category not found")
+            new OA\Response(response: 400, description: "Cannot delete category with plates")
         ]
     )]
     public function destroy(){}
+
+    #[OA\Get(
+        path: "/api/categories/{id}/plates",
+        summary: "List plates by category",
+        tags: ["Categories"],
+        parameters: [
+            new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "List of plates")
+        ]
+    )]
+    public function showPlates(){}
 }
